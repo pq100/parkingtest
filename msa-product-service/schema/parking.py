@@ -33,13 +33,11 @@ class ParkingList(BaseModel):
         }
 
 class ParkseatBase(BaseModel):
-    id: int
     carnum: str
     barrier: bool
 
 
 class ParkseatList(BaseModel):
-    id: int
     carnum: str
     barrier: bool
 

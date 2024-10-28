@@ -34,8 +34,8 @@ def vehiclelist(db: Session):
 
 
 def parkseatlist(db: Session):
-    return db.query(Parkseat.id, Parkseat.carnum,
-                    Parkseat.barrier).order_by(Parkseat.id.desc()).all()
+    return db.query(Parkseat.carnum,
+                    Parkseat.barrier).order_by(Parkseat.carnum.desc()).all()
 
 
 def vehicleone(db: Session, pno: int):
@@ -53,8 +53,8 @@ def vehicleone(db: Session, pno: int):
     return None
 
 
-def vehicledelete(db: Session, id: int):
-    parked_car = db.query(Parkseat).filter(Parkseat.id == id).first()
+def vehicledelete(db: Session, carnum: str):
+    parked_car = db.query(Parkseat).filter(Parkseat.carnum == carnum).first()
 
     if parked_car:
         # 차량의 PNO를 이용해 Parking 테이블에서 해당 차량 정보 가져오기

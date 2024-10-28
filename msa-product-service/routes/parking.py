@@ -48,9 +48,9 @@ async def list_parkseat(db: Session = Depends(get_db)):
     return [ParkseatList.model_validate(ps) for ps in parkseat]
 
 
-@router.delete('/parkseat/{id}', response_model=int)
-async def parkseat_delete(id: int, db: Session = Depends(get_db)):
-    result = vehicledelete(db, id)
+@router.delete('/parkseat/{carnum}', response_model=int)
+async def parkseat_delete(carnum: str, db: Session = Depends(get_db)):
+    result = vehicledelete(db, carnum)
 
     return result
 
