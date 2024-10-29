@@ -1,42 +1,33 @@
+from models.statistics import Payment
 from sqlalchemy.orm import Session
-from schema.statistics import VisitorStatsBase, PaymentStatsBase
-from models.statistics import VisitorStats, PaymentStats
-from typing import List, Optional
+from datetime import datetime
+from collections import defaultdict
 
-# 방문자 통계 등록
-def register_visitor(db: Session, visitor: VisitorStatsBase) -> VisitorStats:
-    try:
-        visitor = VisitorStats(**visitor.model_dump())
-        db.add(visitor)
-        db.commit()
-        db.refresh(visitor)
-        return visitor
-    except Exception as e:
-        print(f"Error registering visitor: {e}")
-        db.rollback()
-        raise
+def get_statistics(db: Session):
+    # 현재 연도 가져오기
+    current_year = datetime.now().year
 
-# 요금 통계 등록
-def register_payment(db: Session, payment: PaymentStatsBase) -> PaymentStats:
-    try:
-        payment = PaymentStats(**payment.model_dump())
-        db.add(payment)
-        db.commit()
-        db.refresh(payment)
-        return payment
-    except Exception as e:
-        print(f"Error registering payment: {e}")
-        db.rollback()
-        raise
+    # 데이터 초기화
+    visitor_data = defaultdict(int)
+    payment_data = defaultdict(float)
 
-# 방문자 통계 목록 조회
-def visitor_list(db: Session) -> List[VisitorStats]:
-    return db.query(VisitorStats).all()
+    # 모든 결제 기록 조회
+    payments = db.query(Payment).all()
 
-# 요금 통계 목록 조회
-def payment_list(db: Session) -> List[PaymentStats]:
-    return db.query(PaymentStats).all()
+    for payment in payments:
+        pay_date = datetime.strptime(payment.paydate, "%Y-%m-%d")  # 날짜 형식에 맞게 조정
+        month = pay_date.strftime("%m")  # 문자열로 월 추출
 
-# 요금 통계 상세 조회
-def payment_one(db: Session, sno: int) -> Optional[PaymentStats]:
-    return db.query(PaymentStats).filter(PaymentStats.sno == sno).first()
+        # 방문자 수 카운트
+        visitor_data[month] += 1  # 해당 월의 방문자 수 증가
+        # 결제 합산
+        payment_data[month] += float(payment.payment)  # 결제가 문자열로 저장된 경우
+
+    # 응답을 위한 결과 포맷팅
+    visitordata = [{"month": month, "visitor_count": count} for month, count in sorted(visitor_data.items())]
+    paymentdata = [{"month": month, "total_payment": total} for month, total in sorted(payment_data.items())]
+
+    return {
+        "visitordata": visitordata,
+        "paymentdata": paymentdata,
+    }
