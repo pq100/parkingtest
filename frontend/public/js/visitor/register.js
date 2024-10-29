@@ -18,7 +18,7 @@ const remainCar = async () => {
 
         if (data) {
 
-            let html = `${data.total_available_spots || 0}/100`;
+            let html = `${data.total_available_spots || 0}`;
             // let html1 = `50/100`;
             remainCars.innerHTML = html;
         }else{

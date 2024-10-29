@@ -10,11 +10,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // 결제 내역 조회
 const paylist = async () => {
-    let url = `http://127.0.0.1:8003/paylist`;
+    let url = `http://127.0.0.1:8003/statistics`;
     const res = await fetch(url);
     if (res.ok) {
         const data = await res.json();
-        return data;
+        if (data) {
+            return data;
+        } else {
+            alert('결제내역이 없습니다.');
+        }
+
     } else {
         throw new Error('결제 내역 목록 조회 실패!!');
     }

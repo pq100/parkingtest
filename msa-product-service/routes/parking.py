@@ -12,7 +12,7 @@ from models.parking import Parkseat
 router = APIRouter()
 
 # 총 자리 수와 장애인용 자리 수 상수 정의
-TOTAL_SPOTS = 100
+TOTAL_SPOTS = 103
 DISABLED_SPOTS = 3
 
 

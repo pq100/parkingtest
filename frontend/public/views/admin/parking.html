@@ -40,8 +40,38 @@
 <!-- Main Content -->
 <main class="container mt-4">
   <h3 class="text-center">주차차량 조회</h3>
-  <div id="parking-spots" class="d-flex flex-wrap justify-content-center mt-4"></div>
+  <div class="ml-5">
+    <div class="status-text" style="color:#ff6347"><b>사용중</b></div>
+    <div class="status-text" style="color:#32cd32"><b>남은 자리</b></div>
+  </div>
+  <div id="parking-areas" class="d-flex flex-wrap justify-content-center mt-4">
+    <div class="parking-area" id="A-area">
+      <h4>A구역</h4>
+      <div class="parking-spots" id="A-parking-spots"></div>
+    </div>
+    <div class="parking-area" id="B-area">
+      <h4>B구역</h4>
+      <div class="parking-spots" id="B-parking-spots"></div>
+    </div>
+    <div class="parking-area" id="C-area">
+      <h4>C구역</h4>
+      <div class="parking-spots" id="C-parking-spots"></div>
+    </div>
+    <div class="parking-area" id="D-area">
+      <h4>D구역</h4>
+      <div class="parking-spots" id="D-parking-spots"></div>
+    </div>
+    <div class="parking-area" id="E-area">
+      <h4>E구역</h4>
+      <div class="parking-spots" id="E-parking-spots"></div>
+    </div>
+    <div class="parking-area" id="F-area">
+      <h4>F구역 (장애인)</h4>
+      <div class="disabled-parking-spots" id="F-disabled-parking-spots"></div> <!-- 장애인 주차 구역 -->
+    </div>
+  </div>
 </main>
+
 
 <!-- Footer -->
 <!--<div id="footer"></div>-->

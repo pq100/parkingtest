@@ -1,21 +1,65 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Float
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
 
+# class Parking(Base):
+#     __tablename__ = 'parking'
+#
+#     pno = Column(Integer, primary_key=True, autoincrement=True, index=True)
+#     carnum = Column(String(50), nullable=False)
+#     barrier = Column(Boolean, nullable=False)
+#     intime = Column(DateTime, nullable=True)
+#     outtime = Column(DateTime, nullable=True)
+#
+# class Parkseat(Base):
+#     __tablename__ = 'parkseat'
+#
+#     # id = Column(Integer, primary_key=True, autoincrement=True, index=True)
+#     carnum = Column(String(50), nullable=False)  # 차량 번호
+#     barrier = Column(Boolean, nullable=False)    # 장애인 여부 (True: 장애인, False: 일반 차량)
+
 class Parking(Base):
     __tablename__ = 'parking'
 
     pno = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    carnum = Column(String(50), nullable=False)
-    barrier = Column(Boolean, nullable=False)
-    intime = Column(DateTime, nullable=True)
+    carnum = Column(String(10), nullable=False)
+    barrier = Column(String(5), nullable=False, default='0')
+    intime = Column(DateTime, default=datetime.now)
     outtime = Column(DateTime, nullable=True)
+
 
 class Parkseat(Base):
     __tablename__ = 'parkseat'
 
-    id = Column(Integer, primary_key=True, autoincrement=True, index=True)
-    carnum = Column(String(50), nullable=False)  # 차량 번호
-    barrier = Column(Boolean, nullable=False)    # 장애인 여부 (True: 장애인, False: 일반 차량)
+    carnum = Column(String(10), primary_key=True, nullable=False)
+    barrier = Column(String(5), nullable=False, default='0')
+
+# 수정 필요
+class Payment(Base):
+    __tablename__ = 'payment'
+
+    payid = Column(String(30), primary_key=True, index=True)
+    payment = Column(String(50))
+    paydate = Column(DateTime, nullable=True)
+    parkingtime = Column(String(20), nullable=True)
+    carnum = Column(String(10), ForeignKey('parking.carnum'))
+
+class VisitorStats(Base):
+    __tablename__ = 'visitor_stats'
+
+    sno = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    carnum = Column(String(10), nullable=False)
+    month = Column(String(10), nullable=False)
+    visitor_count = Column(Integer, nullable=False)
+
+
+class PaymentStats(Base):
+    __tablename__ = 'payment_stats'
+
+    sno = Column(Integer, primary_key=True, autoincrement=True, index=True)
+    month = Column(String(10), nullable=False)
+    total_fee = Column(Float, nullable=False)
