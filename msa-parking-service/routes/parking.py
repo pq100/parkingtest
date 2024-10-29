@@ -20,6 +20,6 @@ async def search_by_carnum(carnum: str, db: Session = Depends(get_db)):
     return carlists(db, carnum)
 
 # 출차시 결제를 위한 내역(입차 중인 parking, payment 데이터)
-@router.get('/outregist/{carnum}')
-async def outpark(carnum: str, db: Session = Depends(get_db)):
-    return set_outtime(db, carnum)
+@router.get('/outregist/{pno}')
+async def outpark(pno: int, db: Session = Depends(get_db)):
+    return set_outtime(db, pno)

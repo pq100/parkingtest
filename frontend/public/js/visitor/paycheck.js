@@ -5,15 +5,20 @@ const path = window.location.pathname;
 const pathSegments = path.split('/');
 
 // 마지막 값을 가져오기 (배열의 마지막 요소)
-const lastSegment = pathSegments[pathSegments.length - 1];
+const pno = pathSegments[pathSegments.length - 1];
 
 // 마지막 값을 디코딩
-const carnum = decodeURIComponent(lastSegment);
+// let carnum = decodeURIComponent(lastSegment);
+// let carnum = lastSegment;
+// console.log(carnum);
+
+// carnum = carnum.replace(/\s/g, '');
 
 // console.log(`마지막 값: ${carnum}`);
 
 window.addEventListener('DOMContentLoaded', async () => {
     try {
+
         const payment = await paylist();
         displayPayment(payment);
 
@@ -30,7 +35,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 })
 
 const paylist = async () => {
-    let url = `http://127.0.0.1:8001/payment/${carnum}`;
+    // console.log(String(carnum));
+    let url = `http://127.0.0.1:8001/payment/${pno}`;
     const res = await fetch(url);
     if (res.ok) {
         const data = await res.json();
@@ -48,6 +54,22 @@ const paylist = async () => {
     //     }
     // ];
     // return dummyData;
+    // console.log(carnum);
+    // const url = `http://127.0.0.1:8001/payment`; // URL 수정
+    // const res = await fetch(url, {
+    //     method: 'POST', // POST 방식
+    //     headers: {
+    //         'Accept': 'application/json',
+    //         'Content-Type': 'application/json' // JSON 형식
+    //     },
+    //     body: JSON.stringify({ "carnum" : carnum }) // carnum을 JSON 형태로 전달
+    // });
+    // if (res.ok) {
+    //     const data = await res.json();
+    //     return data;
+    // } else {
+    //     throw new Error('정산내역 조회 실패!!');
+    // }
 }
 
 const displayPayment = (payment) => {
@@ -56,23 +78,23 @@ const displayPayment = (payment) => {
     let html = `
         <tr>
             <th>차량 번호</th>
-            <td id="carLicense">${carnum}</td>
+            <td id="carLicense">${payment.carnum}</td>
         </tr>
         <tr>
             <th>입차 시간</th>
-            <td id="entryTime">${payment[0].intime}</td>
+            <td id="entryTime">${payment.intime}</td>
         </tr>
         <tr>
             <th>출차 시간</th>
-            <td id="exitTime">${payment[0].outtime}</td>
+            <td id="exitTime">${payment.outtime}</td>
         </tr>
         <tr>
             <th>주차 시간</th>
-            <td id="parkingDuration">${payment[0].paydate}</td>
+            <td id="parkingDuration">${payment.paydate}</td>
         </tr>
         <tr>
             <th>요금 확인</th>
-            <td id="fee">${payment[0].payment}</td>
+            <td id="fee">${payment.payment}</td>
         </tr>
     `
     paytbody.innerHTML = html;

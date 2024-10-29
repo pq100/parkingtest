@@ -50,7 +50,7 @@ const displayCarList = (carnums) => {
         <tr>
             <td>
                 <label>
-                    <input type="radio" name="carLicense" value="${carnum.carnum}" required>
+                    <input type="radio" name="carLicense" value="${carnum.pno}" required>
                     ${carnum.carnum}
                 </label>
             </td>
@@ -69,7 +69,7 @@ nextbtn.addEventListener('click', async (event) => {
     event.preventDefault();
     const selectedCar = document.querySelector('input[name="carLicense"]:checked');
     if (selectedCar) {
-        const carnum = selectedCar.value; // 선택된 차량 번호
+        const pno = selectedCar.value; // 선택된 차량 번호
         // console.log(`선택된 차량 번호: ${carnum}`);
 
         const formData = new FormData(carnumfrm);
@@ -97,11 +97,11 @@ nextbtn.addEventListener('click', async (event) => {
             //     alert('출차 실패'); // 오류 메시지 출력
             // }
 
-            let url = `http://127.0.0.1:8000/outregist/${carnum}`;
+            let url = `http://127.0.0.1:8000/outregist/${pno}`;
             const res = await fetch(url);
             if (res.ok) {
                 alert('출차되었습니다.');
-                window.location.href = `/paycheck/${encodeURIComponent(carnum)}`;
+                window.location.href = `/paycheck/${pno}`;
             } else {
                 throw new Error('차량 목록 조회 실패!!');
             }

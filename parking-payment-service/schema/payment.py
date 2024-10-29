@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 from typing import Optional
 
@@ -26,6 +28,19 @@ class PaymentList(BaseModel):
     paydate: str
     parkingtime: str
     carnum: str
+
+    class Config:
+        from_attributes = True  # orm_mode 대신 사용
+
+class CarNumRequest(BaseModel):
+    carnum: str
+
+class ParkingList(BaseModel):
+    pno: int
+    carnum: str
+    barrier: str
+    intime: datetime
+    outtime: datetime
 
     class Config:
         from_attributes = True  # orm_mode 대신 사용

@@ -3,7 +3,7 @@ from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from schema.payment import PaymentBase, Payment, PaymentList
+from schema.payment import PaymentBase, Payment, PaymentList, CarNumRequest, ParkingList
 from service.database import get_db
 from service.payment import register, paymentlist, paymentone
 
@@ -23,9 +23,19 @@ async def paycheck(db: Session = Depends(get_db)):
 
 
 # 특정 정산내역
-@router.get('/payment/{carnum}')
-async def get_paymentone(carnum: str, db: Session = Depends(get_db)):
-    payments = paymentone(db, carnum)
-    if not payments:
+@router.get('/payment/{pno}')
+async def get_paymentone(pno: int, db: Session = Depends(get_db)):
+    parkings = paymentone(db, pno)
+    if not parkings:
         raise HTTPException(404, '결제내역이 없습니다')
-    return [PaymentList.model_validate(p) for p in payments]
+    return ParkingList.model_validate(parkings)
+
+# @router.post('/payment')
+# async def get_paymentone(request: CarNumRequest, db: Session = Depends(get_db)):
+#     try:
+#         payments = paymentone(db, request.carnum)
+#         if not payments:
+#             raise HTTPException(404, '결제내역이 없습니다')
+#         return [PaymentList.model_validate(p) for p in payments]
+#     except Exception as e:
+#         raise HTTPException(500, f'서버 오류: {str(e)}')

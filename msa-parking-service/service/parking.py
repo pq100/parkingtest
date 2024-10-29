@@ -67,17 +67,17 @@ def register(db: Session, parking: ParkingBase):
 # 입차 내역 전부 조회
 def carlists(db: Session, parknum: str):
     query = (
-        db.query(Parkseat.carnum, Parking.intime)
+        db.query(Parkseat.carnum, Parking.intime, Parking.pno)
         .join(Parking, Parking.carnum == Parkseat.carnum)
         .filter(Parkseat.carnum.like(f"%{parknum}"))
     )
     result = query.all()
-    return [{"carnum": row[0], "intime": row[1]} for row in result]
+    return [{"carnum": row[0], "intime": row[1], "pno":row[2]} for row in result]
 
 # 출차
 # carlists에서 주차한 차를 선택해서 outregist페이지로 넘어갈 때 outtime 저장
-def set_outtime(db: Session, carnum: str):
-    parking = db.query(Parking).filter(Parking.carnum == carnum).first()
+def set_outtime(db: Session, pno: int):
+    parking = db.query(Parking).filter(Parking.pno == pno).first()
 
     if not parking:
         return {"error": "Car not found"}
