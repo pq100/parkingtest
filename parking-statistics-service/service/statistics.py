@@ -15,13 +15,14 @@ def get_statistics(db: Session):
     payments = db.query(Payment).all()
 
     for payment in payments:
-        pay_date = datetime.strptime(payment.paydate, "%Y-%m-%d")  # 날짜 형식에 맞게 조정
-        month = pay_date.strftime("%m")  # 문자열로 월 추출
+        if payment.paydate:
+            pay_date = payment.paydate  # 이미 DateTime 형식이라 변환할 필요 없음
+            month = pay_date.strftime("%m")  # 문자열로 월 추출
 
-        # 방문자 수 카운트
-        visitor_data[month] += 1  # 해당 월의 방문자 수 증가
-        # 결제 합산
-        payment_data[month] += float(payment.payment)  # 결제가 문자열로 저장된 경우
+            # 방문자 수 카운트
+            visitor_data[month] += 1  # 해당 월의 방문자 수 증가
+            # 결제 합산
+            payment_data[month] += payment.payment  # 결제가 Float으로 저장됨
 
     # 응답을 위한 결과 포맷팅
     visitordata = [{"month": month, "visitor_count": count} for month, count in sorted(visitor_data.items())]

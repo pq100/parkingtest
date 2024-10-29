@@ -72,8 +72,67 @@ const paylist = async () => {
     // }
 }
 
+// const displayPayment = (payment) => {
+//     const paytbody = document.querySelector('#paytbody');
+//
+//     let html = `
+//         <tr>
+//             <th>차량 번호</th>
+//             <td id="carLicense">${payment.carnum}</td>
+//         </tr>
+//         <tr>
+//             <th>입차 시간</th>
+//             <td id="entryTime">${payment.intime}</td>
+//         </tr>
+//         <tr>
+//             <th>출차 시간</th>
+//             <td id="exitTime">${payment.outtime}</td>
+//         </tr>
+//         <tr>
+//             <th>주차 시간</th>
+//             <td id="parkingDuration">${payment.paydate}</td>
+//         </tr>
+//         <tr>
+//             <th>요금 확인</th>
+//             <td id="fee">${payment.payment}</td>
+//         </tr>
+//     `
+//     paytbody.innerHTML = html;
+// }
+
 const displayPayment = (payment) => {
     const paytbody = document.querySelector('#paytbody');
+
+    // 입차 및 출차 시간을 Date 객체로 변환
+    const intime = new Date(payment.intime);
+    const outtime = new Date(payment.outtime);
+
+    // 주차 시간 계산 (분 단위)
+    const diffMs = outtime - intime; // 밀리초 차이
+    const diffMinutes = Math.ceil(diffMs / (1000 * 60)); // 분 단위로 변환하고 올림 처리 (10분 단위 요금 적용)
+
+    // 주차 요금 계산
+    const hourlyRate = 3000; // 1시간 요금
+    const per10MinutesRate = 500; // 10분당 요금
+    const hours = Math.floor(diffMinutes / 60); // 시간 부분
+
+    const extraMinutes = diffMinutes % 60; // 나머지 분
+
+    // 기본 요금은 1시간 단위 요금 * 시간
+    let totalFee = hours * hourlyRate;
+
+    // 추가 10분 단위 요금 계산
+    if (extraMinutes > 0) {
+        totalFee += Math.ceil(extraMinutes / 10) * per10MinutesRate;
+    }
+
+    // 주차 시간과 요금을 표시할 형식으로 변환
+    const parkingDuration = `${Math.floor(diffMinutes / 60)}시간 ${diffMinutes % 60}분`;
+    const feeFormatted = `${totalFee.toLocaleString()}원`; // 숫자 형식으로 변환
+
+    // 시간 형식 변경 (시/분 단위로만 표시)
+    const intimeFormatted = intime.toISOString().slice(0, 16).replace("T", " ");
+    const outtimeFormatted = outtime.toISOString().slice(0, 16).replace("T", " ");
 
     let html = `
         <tr>
@@ -82,66 +141,25 @@ const displayPayment = (payment) => {
         </tr>
         <tr>
             <th>입차 시간</th>
-            <td id="entryTime">${payment.intime}</td>
+            <td id="entryTime">${intimeFormatted}</td>
         </tr>
         <tr>
             <th>출차 시간</th>
-            <td id="exitTime">${payment.outtime}</td>
+            <td id="exitTime">${outtimeFormatted}</td>
         </tr>
         <tr>
             <th>주차 시간</th>
-            <td id="parkingDuration">${payment.paydate}</td>
+            <td id="parkingDuration">${parkingDuration}</td>
         </tr>
         <tr>
             <th>요금 확인</th>
-            <td id="fee">${payment.payment}</td>
+            <td id="fee">${feeFormatted}</td>
         </tr>
-    `
+    `;
     paytbody.innerHTML = html;
 }
 
-// 아임포트 결제 api
-// document.getElementById('confirmPaymentButton').addEventListener('click', function (event) {
-//     event.preventDefault();
-//
-//     // 아임포트 결제 시작
-//     var IMP = window.IMP;
-//     IMP.init('imp77608186'); // 본인의 가맹점 식별코드로 변경
-//
-//     // 결제 금액 가져오기
-//     var amount = parseInt(document.getElementById('fee').innerText.replace(/[^0-9]/g, ''), 10);
-//
-//     // 결제 요청
-//     IMP.request_pay({
-//         pg: 'html5_inicis',
-//         pay_method: 'card',
-//         merchant_uid: 'merchant_' + new Date().getTime(), // 주문 번호
-//         name: '주차 요금 결제', // 주문명
-//         amount: amount, // 결제 금액
-//         buyer_email: 'test@example.com', // 예약자 이메일
-//         buyer_name: '홍길동', // 예약자 이름
-//         buyer_tel: '010-1234-5678' // 예약자 연락처
-//     }, function (rsp) {
-//         if (rsp.success) {
-//             // 결제 성공 시 서버로 데이터 전송
-//             fetch('/pay/complete', {
-//                 method: 'POST',
-//                 headers: { 'Content-Type': 'application/json' },
-//                 body: JSON.stringify({ imp_uid: rsp.imp_uid, success: true })
-//             })
-//                 .then(response => response.json())
-//                 .then(data => {
-//                     alert('결제가 완료되었습니다.');
-//                     window.location.href = '/rental';
-//                 })
-//                 .catch(error => {
-//                     alert('서버와의 통신 중 오류가 발생했습니다.');
-//                 });
-//         } else {
-//             alert('결제가 실패했습니다.');
-//         }
-//     });
-// });
+
 
 const processPayment = () => {
     // 아임포트 결제 시작
