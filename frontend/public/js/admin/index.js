@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 // 방문 차량 조회 내역
 const visitedCars = async () => {
-    let url = `http://127.0.0.1:8000/vistedcars`;
+    let url = `http://127.0.0.1:8002/vehicles`;
     const res = await fetch(url);
     if (res.ok) {
         const data = await res.json();
@@ -34,9 +34,9 @@ const displayCarList = (cars) => {
     for ( const car of cars) {
         html += `
         <tr class="text-center">
-            <td>${car.carnum}g</td>
-            <td>${car.intime}g</td>
-            <td>${car.outtime}g</td>
+            <td>${car.carnum}</td>
+            <td>${car.intime}</td>
+            <td>${car.outtime || '주차중'}</td>
         </tr>
         `
     }
