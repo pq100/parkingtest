@@ -15,9 +15,9 @@ async def new_parking(parking: ParkingBase, db:Session=Depends(get_db)):
 
 
 # 출차 시 주차한 차 4자리번호로 조회한 목록 = parknum
-@router.get('/carlists/{parknum}')
-async def search_by_carnum(parknum: str, db: Session = Depends(get_db)):
-    return carlists(db, parknum)
+@router.get('/carlists/{carnum}')
+async def search_by_carnum(carnum: str, db: Session = Depends(get_db)):
+    return carlists(db, carnum)
 
 # 출차시 결제를 위한 내역(입차 중인 parking, payment 데이터)
 @router.get('/outregist/{carnum}')

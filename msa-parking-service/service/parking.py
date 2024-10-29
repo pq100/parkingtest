@@ -57,7 +57,12 @@ def register(db: Session, parking: ParkingBase):
     db.commit()
     db.refresh(parking)
 
-    return parking
+    return {
+        "carnum": parking.carnum,
+        "barrier": parking.barrier,
+        "intime": parking.intime,
+        "outtime": parking.outtime,
+    }
 
 # 입차 내역 전부 조회
 def carlists(db: Session, parknum: str):
@@ -67,7 +72,7 @@ def carlists(db: Session, parknum: str):
         .filter(Parkseat.carnum.like(f"%{parknum}"))
     )
     result = query.all()
-    return result
+    return [{"carnum": row[0], "intime": row[1]} for row in result]
 
 # 출차
 # carlists에서 주차한 차를 선택해서 outregist페이지로 넘어갈 때 outtime 저장

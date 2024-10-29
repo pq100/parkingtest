@@ -32,8 +32,8 @@ const remainCar = async () => {
         // }
         if (data) {
             // 임시 데이터 설정
-            totalSpots = data.total_available_spots || 0;
-            carCount = totalSpots-data.non_disabled_spots_left || 0;
+            totalSpots = 100 || 0;
+            carCount = 100-data.non_disabled_spots_left || 0;
         } else {
             alert('주차 데이터가 없습니다.');
         }}
