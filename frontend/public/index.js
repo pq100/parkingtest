@@ -31,5 +31,10 @@ router.get('/admin/parking', function(req, res, next) {
   res.sendFile(__dirname + '/views/admin/parking.html');
 });
 
+router.get('/admin/statistics', function(req, res, next) {
+  res.sendFile(__dirname + '/views/admin/statistics.html');
+});
+
+
 
 module.exports = router;

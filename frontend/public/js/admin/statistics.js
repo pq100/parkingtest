@@ -56,8 +56,8 @@ const feeData = {
     labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
     datasets: [{
         label: '요금 (만원)',
-        data: [10, 15, 17, 20, 18, 22, 30, 35, 40, 38, 42, 45],
-        // data: fData,
+        // data: [10, 15, 17, 20, 18, 22, 30, 35, 40, 38, 42, 45],
+        data: fData,
         backgroundColor: 'rgba(255, 99, 132, 0.6)',
         borderColor: 'rgba(255, 99, 132, 1)',
         borderWidth: 1,

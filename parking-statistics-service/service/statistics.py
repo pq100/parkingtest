@@ -1,34 +1,30 @@
-from models.statistics import Payment
 from sqlalchemy.orm import Session
-from datetime import datetime
-from collections import defaultdict
+from sqlalchemy import extract, func
+from models.statistics import Payment  # 경로 조정 필요
+from schema.statistics import StatisticsResponse
 
-def get_statistics(db: Session):
-    # 현재 연도 가져오기
-    current_year = datetime.now().year
+def get_monthly_payments(db: Session):
+    monthly_payments = [0] * 12
+    results = db.query(
+        extract('month', Payment.paydate).label('month'),
+        func.sum(Payment.payment).label('total_payment')
+    ).group_by('month').all()
 
-    # 데이터 초기화
-    visitor_data = defaultdict(int)
-    payment_data = defaultdict(float)
+    for month, total_payment in results:
+        monthly_payments[int(month) - 1] = total_payment
 
-    # 모든 결제 기록 조회
-    payments = db.query(Payment).all()
+    return monthly_payments
 
-    for payment in payments:
-        if payment.paydate:
-            pay_date = payment.paydate  # 이미 DateTime 형식이라 변환할 필요 없음
-            month = pay_date.strftime("%m")  # 문자열로 월 추출
+def get_monthly_visitors(db: Session):
+    monthly_visitors = [0] * 12
+    # 방문자 수를 가져오는 로직을 여기에 추가하세요.
+    return monthly_visitors
 
-            # 방문자 수 카운트
-            visitor_data[month] += 1  # 해당 월의 방문자 수 증가
-            # 결제 합산
-            payment_data[month] += payment.payment  # 결제가 Float으로 저장됨
+def get_statistics(db: Session) -> StatisticsResponse:
+    monthly_payments = get_monthly_payments(db)
+    monthly_visitors = get_monthly_visitors(db)
 
-    # 응답을 위한 결과 포맷팅
-    visitordata = [{"month": month, "visitor_count": count} for month, count in sorted(visitor_data.items())]
-    paymentdata = [{"month": month, "total_payment": total} for month, total in sorted(payment_data.items())]
+    visitordata = [{"month": str(i + 1), "visitor_count": count} for i, count in enumerate(monthly_visitors)]
+    paymentdata = [{"month": str(i + 1), "total_payment": total} for i, total in enumerate(monthly_payments)]
 
-    return {
-        "visitordata": visitordata,
-        "paymentdata": paymentdata,
-    }
+    return StatisticsResponse(visitordata=visitordata, paymentdata=paymentdata)

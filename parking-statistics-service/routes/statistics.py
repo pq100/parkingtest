@@ -9,5 +9,8 @@ router = APIRouter()
 
 @router.get("/statistics", response_model=StatisticsResponse)
 async def read_statistics(db: Session = Depends(get_db)):
-    stats = get_statistics(db)
-    return stats
+    try:
+        stats = get_statistics(db)
+        return stats
+    except Exception as e:
+        return {"error": str(e)}
