@@ -2,12 +2,15 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관리자 페이지</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/css/admin/statistics.css">
-  <title>월별 통계 그래프</title>
+  <link rel="stylesheet" href="/css/admin/index.css"> <!-- 커스텀 CSS 파일 -->
+  <link rel="stylesheet" href="/css/admin/parking.css">
+
 </head>
+<body class="bg-light">
 
 <!-- Header -->
 <header id="header">
@@ -32,25 +35,40 @@
   </nav>
 </header>
 
-<body>
-<div class="container mt-5">
-  <h2 class="text-center mb-5">월별 방문자 수 및 요금</h2>
 
-  <div class="row">
-    <div class="col-md-6">
-      <canvas id="visitorChart"></canvas>
-    </div>
-    <div class="col-md-6">
-      <canvas id="feeChart"></canvas>
+
+<!-- Main Content -->
+<main class="container mt-4">
+  <div class="container mt-5">
+    <div class="d-flex justify-content-start">
+      <a href="/admin/parking" class="btn btn-secondary mr-2"> 그림 조회</a>
+      <a href="/admin/parkingspots" class="btn btn-primary">목록 조회</a>
     </div>
   </div>
-</div>
+  <h3 class="text-center">주차차량 조회</h3>
+  <table class="table table-bordered mt-4 text-center">
+    <thead class="thead-light">
+    <tr>
+      <th>차량 번호</th>
+      <th>장애 여부</th>
+    </tr>
+    </thead>
+    <tbody id="parkseat-list"></tbody>
+  </table>
+</main>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Footer -->
+<!--<div id="footer"></div>-->
+<footer class="bg-light text-center py-3">
+  <p>&copy; 2024 관리자 페이지. 모든 권리 보유.</p>
+</footer>
+
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="/js/admin/statistics.js"></script>
+<script src="/js/admin/parkingspots.js"></script>
+
 </body>
 </html>

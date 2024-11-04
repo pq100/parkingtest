@@ -1,8 +1,13 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import extract, func
-from models.statistics import Payment  # 경로 조정 필요
+from models.statistics import Payment
 from schema.statistics import StatisticsResponse
 
+# 결제내역 조회
+def getpaymentlist(db: Session):
+    return db.query(Payment).all()
+
+# 통계 및 분석
 def get_monthly_payments(db: Session):
     monthly_payments = [0] * 12
     results = db.query(
@@ -17,8 +22,19 @@ def get_monthly_payments(db: Session):
 
 def get_monthly_visitors(db: Session):
     monthly_visitors = [0] * 12
-    # 방문자 수를 가져오는 로직을 여기에 추가하세요.
+
+    # 월별 방문자 수 집계
+    results = db.query(
+        extract('month', Payment.paydate).label('month'),
+        func.count(Payment.payid).label('count')
+    ).group_by('month').all()
+
+    # 결과를 monthly_visitors 리스트에 저장
+    for month, count in results:
+        monthly_visitors[int(month) - 1] = count  # month는 1부터 시작하므로 인덱스를 조정
+
     return monthly_visitors
+
 
 def get_statistics(db: Session) -> StatisticsResponse:
     monthly_payments = get_monthly_payments(db)

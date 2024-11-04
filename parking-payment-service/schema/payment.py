@@ -6,7 +6,7 @@ from typing import Optional
 # 결제 기본 정보 스키마
 class PaymentBase(BaseModel):
     payment: str
-    paydate: str
+    paydate: Optional[datetime] = None  # datetime으로 변경하여 ISO 형식 처리
     parkingtime: str
     carnum: str
 
@@ -23,7 +23,6 @@ class Payment(PaymentBase):
 
 # 결제 목록 조회 시 사용되는 스키마
 class PaymentList(BaseModel):
-    payid: int
     payment: str
     paydate: str
     parkingtime: str

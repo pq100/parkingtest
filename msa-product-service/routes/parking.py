@@ -12,7 +12,7 @@ from models.parking import Parkseat
 router = APIRouter()
 
 # 총 자리 수와 장애인용 자리 수 상수 정의
-TOTAL_SPOTS = 103
+TOTAL_SPOTS = 100
 DISABLED_SPOTS = 3
 
 
@@ -57,22 +57,50 @@ async def parkseat_delete(carnum: str, db: Session = Depends(get_db)):
 
 @router.get("/available-spots")
 async def get_available_spots(db: Session = Depends(get_db)):
+    # # 전체 사용 중인 자리 수
+    # total_occupied = db.query(Parkseat).count()
+    #
+    # # 장애인 전용 자리 사용 중인 수
+    # disabled_occupied = db.query(Parkseat).filter(Parkseat.barrier == True).count()
+    #
+    # # 비장애인 자리 사용 중인 수
+    # non_disabled_occupied = total_occupied - disabled_occupied
+    #
+    # # 남은 자리 계산
+    # disabled_spots_left = DISABLED_SPOTS - disabled_occupied
+    # non_disabled_spots_left = (TOTAL_SPOTS - DISABLED_SPOTS) - non_disabled_occupied
+    #
+    # # 결과 반환
+    # return {
+    #     "total_available_spots": TOTAL_SPOTS - total_occupied,
+    #     "disabled_spots_left": max(0, disabled_spots_left),  # 남은 자리가 음수가 되지 않도록 0을 최소값으로 설정
+    #     "non_disabled_spots_left": max(0, non_disabled_spots_left)
+    # }
     # 전체 사용 중인 자리 수
     total_occupied = db.query(Parkseat).count()
 
-    # 장애인 전용 자리 사용 중인 수
-    disabled_occupied = db.query(Parkseat).filter(Parkseat.barrier == True).count()
-
-    # 비장애인 자리 사용 중인 수
-    non_disabled_occupied = total_occupied - disabled_occupied
-
     # 남은 자리 계산
-    disabled_spots_left = DISABLED_SPOTS - disabled_occupied
-    non_disabled_spots_left = (TOTAL_SPOTS - DISABLED_SPOTS) - non_disabled_occupied
+    total_available_spots = TOTAL_SPOTS - total_occupied
+    print("hello", total_available_spots)
 
     # 결과 반환
     return {
-        "total_available_spots": TOTAL_SPOTS - total_occupied,
-        "disabled_spots_left": max(0, disabled_spots_left),  # 남은 자리가 음수가 되지 않도록 0을 최소값으로 설정
-        "non_disabled_spots_left": max(0, non_disabled_spots_left)
+        "total_available_spots": total_available_spots,
+        "used_spots": total_occupied  # 사용 중인 자리 수 추가
+    }
+
+@router.get("/status")
+def get_parking_status(db: Session = Depends(get_db)):
+    total_spots = 100  # 주차장의 총 자리 수
+    used_spots_query = db.query(Parkseat.parknum).all()
+
+    # 사용 중인 parknum 리스트 생성
+    used_parknums = [spot.parknum for spot in used_spots_query]
+    used_spots = len(used_parknums)  # 사용 중인 자리 수
+
+    # JSON 형태로 데이터를 반환
+    return {
+        "total_available_spots": total_spots,
+        "used_spots": used_spots,
+        "used_parknums": used_parknums
     }

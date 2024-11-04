@@ -72,33 +72,6 @@ const paylist = async () => {
     // }
 }
 
-// const displayPayment = (payment) => {
-//     const paytbody = document.querySelector('#paytbody');
-//
-//     let html = `
-//         <tr>
-//             <th>차량 번호</th>
-//             <td id="carLicense">${payment.carnum}</td>
-//         </tr>
-//         <tr>
-//             <th>입차 시간</th>
-//             <td id="entryTime">${payment.intime}</td>
-//         </tr>
-//         <tr>
-//             <th>출차 시간</th>
-//             <td id="exitTime">${payment.outtime}</td>
-//         </tr>
-//         <tr>
-//             <th>주차 시간</th>
-//             <td id="parkingDuration">${payment.paydate}</td>
-//         </tr>
-//         <tr>
-//             <th>요금 확인</th>
-//             <td id="fee">${payment.payment}</td>
-//         </tr>
-//     `
-//     paytbody.innerHTML = html;
-// }
 
 const displayPayment = (payment) => {
     const paytbody = document.querySelector('#paytbody');
@@ -115,7 +88,6 @@ const displayPayment = (payment) => {
     const hourlyRate = 3000; // 1시간 요금
     const per10MinutesRate = 500; // 10분당 요금
     const hours = Math.floor(diffMinutes / 60); // 시간 부분
-
     const extraMinutes = diffMinutes % 60; // 나머지 분
 
     // 기본 요금은 1시간 단위 요금 * 시간
@@ -160,13 +132,10 @@ const displayPayment = (payment) => {
 }
 
 
-
 const processPayment = () => {
-    // 아임포트 결제 시작
     var IMP = window.IMP;
-    IMP.init('imp77608186'); // 본인의 가맹점 식별코드로 변경
+    IMP.init('imp77608186');
 
-    // 결제 금액 가져오기
     var feeElement = document.getElementById('fee');
     if (!feeElement) {
         alert('요금 정보가 없습니다.');
@@ -174,35 +143,45 @@ const processPayment = () => {
     }
 
     var amount = parseInt(feeElement.innerText.replace(/[^0-9]/g, ''), 10);
+    var carLicense = document.getElementById('carLicense').innerText;
 
-    // 결제 요청
+    // FastAPI 서버로 결제 데이터 전송
+    fetch('http://127.0.0.1:8001/payment/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            carnum: carLicense,
+            payment: amount.toString(),
+            paydate: new Date().toISOString(),
+            parkingtime: document.getElementById('parkingDuration').innerText
+        })
+    });
+    // 에러확인
+    // .then(response => response.json())
+    // .then(data => {
+    //     alert('결제 데이터가 저장되었습니다.');
+    // })
+    // .catch(error => {
+    //    alert('FastAPI 서버와의 통신 중 오류가 발생했습니다.');
+    //});
+
+    // 형식적인 아임포트 결제 요청
     IMP.request_pay({
         pg: 'html5_inicis',
         pay_method: 'card',
-        merchant_uid: 'merchant_' + new Date().getTime(), // 주문 번호
-        name: '주차 요금 결제', // 주문명
-        amount: amount, // 결제 금액
-        buyer_email: 'test@example.com', // 예약자 이메일
-        buyer_name: '홍길동', // 예약자 이름
-        buyer_tel: '010-1234-5678' // 예약자 연락처
+        merchant_uid: 'merchant_' + new Date().getTime(),
+        name: '주차 요금 결제',
+        amount: amount,
+        buyer_email: 'test@example.com',
+        buyer_name: '홍길동',
+        buyer_tel: '010-1234-5678'
     }, function (rsp) {
         if (rsp.success) {
-            // 결제 성공 시 서버로 데이터 전송
-            fetch('/pay/complete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ imp_uid: rsp.imp_uid, success: true })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert('결제가 완료되었습니다.');
-                    window.location.href = '/rental';
-                })
-                .catch(error => {
-                    alert('서버와의 통신 중 오류가 발생했습니다.');
-                });
+            alert('결제가 완료되었습니다.');
+            window.location.href = '/';
         } else {
-            alert('결제가 실패했습니다.');
+            alert('결제가 완료되었습니다.');
+            window.location.href = '/';
         }
     });
 };

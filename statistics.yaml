@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parking-statistics-service
+  labels:
+    app: parking-statistics-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parking-statistics-service
+  template:
+    metadata:
+      labels:
+        app: parking-statistics-service
+    spec:
+      containers:
+        - name: parking-statistics-service
+          image: snicuz0588/parking-statistics-service:latest
+          ports:
+            - containerPort: 8003
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parking-statistics-service
+spec:
+  selector:
+    app: parking-statistics-service
+  ports:
+    - port: 8003
+      protocol: TCP
+      targetPort: 8003

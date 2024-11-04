@@ -1,0 +1,126 @@
+---
+version: '3.8'
+services:
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/usr/src/app
+    working_dir: /usr/src/app
+    environment:
+      - API_URL=${API_URL}
+      - BACKEND1_URL=${BACKEND1_URL}
+      - BACKEND2_URL=${BACKEND2_URL}
+      - BACKEND3_URL=${BACKEND3_URL}
+      - BACKEND4_URL=${BACKEND4_URL}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+      - backend4
+    networks:
+      - parking-network
+
+  backend1:
+    container_name: register
+    build: ./msa-parking-service
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mariadb
+    networks:
+      - parking-network
+
+  backend2:
+    container_name: payment
+    build: ./parking-payment-service
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mariadb
+    networks:
+      - parking-network
+
+  backend3:
+    container_name: parking
+    build: ./msa-product-service
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8002
+    ports:
+      - "8002:8002"
+    depends_on:
+      - mariadb
+    networks:
+      - parking-network
+
+  backend4:
+    container_name: statistics
+    build: ./parking-statistics-service
+    env_file:
+      - .env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8003
+    ports:
+      - "8003:8003"
+    depends_on:
+      - mariadb
+    networks:
+      - parking-network
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:10.11.9-jammy
+    env_file:
+      - .env
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - parking-network
+
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins:lts
+    user: root
+    environment:
+      - JENKINS_OPTS=--prefix=/jenkins
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    networks:
+      - parking-network
+
+  argocd:
+    container_name: argocd
+    image: argoproj/argocd:v2.4.7
+    ports:
+      - "8081:8081"
+    command: ["argocd-server", "--insecure"]
+    networks:
+      - parking-network
+
+volumes:
+  mariadb_data:
+  jenkins_home:
+
+networks:
+  parking-network:

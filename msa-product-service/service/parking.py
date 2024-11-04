@@ -29,7 +29,7 @@ def register(db: Session, parking_data: ParkingBase):
 
 
 def vehiclelist(db: Session):
-    return db.query(Parking.carnum, Parking.barrier, Parking.intime,
+    return db.query(Parking.carnum, Parking.barrier, Parking.intime, Parking.outtime,
                     Parking.pno).order_by(Parking.pno.desc()).all()
 
 
@@ -79,20 +79,27 @@ def vehicledelete(db: Session, carnum: str):
 
 
 def get_available_spots(db: Session):
-    # 장애인 차량과 비장애인 차량의 수를 각각 조회
+    # # 장애인 차량과 비장애인 차량의 수를 각각 조회
+    # total_parked = db.query(Parkseat).count()
+    # disabled_parked = db.query(Parkseat).filter(True == Parkseat.barrier).count()
+    # regular_parked = db.query(Parkseat).filter(False == Parkseat.barrier).count()
+    #
+    # # 남은 자리 수 계산
+    # available_spots = TOTAL_SPOTS - total_parked
+    # available_disabled_spots = DISABLED_SPOTS - disabled_parked
+    # available_regular_spots = (TOTAL_SPOTS - DISABLED_SPOTS) - regular_parked
+
+    # 주차된 차량의 총 수 조회
     total_parked = db.query(Parkseat).count()
-    disabled_parked = db.query(Parkseat).filter(True == Parkseat.barrier).count()
-    regular_parked = db.query(Parkseat).filter(False == Parkseat.barrier).count()
 
     # 남은 자리 수 계산
     available_spots = TOTAL_SPOTS - total_parked
-    available_disabled_spots = DISABLED_SPOTS - disabled_parked
-    available_regular_spots = (TOTAL_SPOTS - DISABLED_SPOTS) - regular_parked
 
     return {
         "total_available_spots": available_spots,
-        "disabled_spots_left": max(0, available_disabled_spots),
-        "non_disabled_spots_left": max(0, available_regular_spots)
+        # "disabled_spots_left": max(0, available_disabled_spots),
+        # "non_disabled_spots_left": max(0, available_regular_spots)
+        "used_spots": total_parked
     }
 
 

@@ -1,74 +1,75 @@
-// 이용가능한 차량 수
-let carCount = 0;
-// 총 주차 자리 수
-let totalSpots = 0;
+// import config from '../../../config.js';
 
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('load', async () => {
     try {
-        await remainCar();
+        const availableSpots = await getAvailableSpots();
+        displayAvailableSpots(availableSpots);
     } catch (e) {
-        console.log(e);
-        alert('남은 주차 자리수 조회 실패!');
+        console.error('차량 목록 조회 실패:', e); // 에러 로그 출력
+        alert('차량 목록 조회 실패!'); // 사용자에게 알림
     }
 });
 
-// 남은 주차자리 수
-const remainCar = async () => {
-
-    let url = 'http://127.0.0.1:8002/available-spots'
+// 남은 자리 수 가져오기
+const getAvailableSpots = async () => {
+    let url = `http://127.0.0.1:8002/available-spots`;
     const res = await fetch(url);
+
     if (res.ok) {
         const data = await res.json();
-        // const remainCars = document.querySelector('#remainCars');
-        // // const remainBarrier = document.querySelector('#remainBarrier');
-        //
-        // if (data) {
-        //
-        //     let html = `${data.total_available_spots || 0}/100`;
-        //     // let html1 = `50/100`;
-        //     remainCars.innerHTML = html;
-        // }else{
-        //     console.log('no')
-        // }
-        if (data) {
-            // 임시 데이터 설정
-            totalSpots = 100 || 0;
-            carCount = 100-data.non_disabled_spots_left || 0;
-        } else {
-            alert('주차 데이터가 없습니다.');
-        }}
-
-
-    const usedSpots = carCount;
-    const usedIndices = new Set();
-
-    // 랜덤한 인덱스 생성 (중복되지 않도록)
-    while (usedIndices.size < usedSpots) {
-        const randomIndex = Math.floor(Math.random() * totalSpots);
-        usedIndices.add(randomIndex);
+        console.log(data);
+        return {
+            total_available_spots: data.total_available_spots || 100,
+            used_spots: data.used_spots || 0
+        };
+    } else {
+        throw new Error('남은 자리 수 fetch 실패!');
     }
+};
 
-    // 장애인 주차 공간 사용 중인 자리 수
-    const disabledUsedCount = 2; // 사용 중인 장애인 주차 자리 수
-    const totalDisabledSpots = 3; // 총 장애인 주차 자리 수
 
-    // 구역당 20개 공간을 생성
+const displayAvailableSpots = (availableSpots) => {
+    const availableSpotsElement = document.querySelector('#available-spots');
+
+    // availableSpots가 undefined일 경우 기본값으로 초기화
+    const availableTotalSpots = availableSpots?.total_available_spots ?? 0;
+    const usedSpots = availableSpots?.used_spots ?? 0;
+    const remainingSpots = availableTotalSpots;
+
+    console.log(`사용 중인 자리: ${usedSpots}, 남은 자리: ${remainingSpots}`);
+
+    // HTML에 남은 자리 수와 사용 중인 자리 수 업데이트
+    availableSpotsElement.innerHTML = `
+        <div class="status-text" style="color:#ff6347">
+            <b>사용 중인 자리: ${usedSpots}</b>
+        </div>
+        <div class="status-text" style="color:#32cd32">
+            <b>남은 자리: ${remainingSpots}</b>
+        </div>
+    `;
+};
+
+// 주차 현황을 표시하는 함수
+const displayParkingSpots = (availableSpots, usedParknums) => {
     const areas = ['A', 'B', 'C', 'D', 'E'];
-    let index = 0;
+    const spotsPerArea = 20;
+    let index = 1;
+
+    const usedSpotsSet = new Set(usedParknums);
 
     for (const area of areas) {
         const parkingSpotsContainer = document.getElementById(`${area}-parking-spots`);
+        parkingSpotsContainer.innerHTML = ''; // 초기화
 
-        // 일반 주차 공간 생성
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < spotsPerArea; i++) {
             const spot = document.createElement("div");
             spot.className = "parking-spot";
 
-            // 사용된 자리일 경우 색상 변경
-            if (usedIndices.has(index)) {
-                spot.style.backgroundColor = "#ff6347"; // 사용 중 (예: 빨간색)
+            // 사용 중인 자리인지 확인하여 색상 지정
+            if (usedSpotsSet.has(index)) {
+                spot.style.backgroundColor = "#ff6347"; // 사용 중 (빨간색)
             } else {
-                spot.style.backgroundColor = "#32cd32"; // 사용 가능 (예: 초록색)
+                spot.style.backgroundColor = "#32cd32"; // 비어 있음 (초록색)
             }
 
             parkingSpotsContainer.appendChild(spot);
@@ -76,19 +77,55 @@ const remainCar = async () => {
         }
     }
 
-    // F구역에 장애인 주차 공간 생성
+    // 장애인 주차 공간 처리
     const disabledParkingSpotsContainer = document.getElementById("F-disabled-parking-spots");
+    disabledParkingSpotsContainer.innerHTML = '';
+
+    const disabledUsedCount = 0;
+    const totalDisabledSpots = 3;
+
     for (let j = 0; j < totalDisabledSpots; j++) {
         const disabledSpot = document.createElement("div");
         disabledSpot.className = "disabled-parking-spot";
 
-        // 사용된 자리일 경우 색상 변경
         if (j < disabledUsedCount) {
             disabledSpot.style.backgroundColor = "#ff6347"; // 사용 중
         } else {
-            disabledSpot.style.backgroundColor = "#0000ff"; // 사용 가능
+            disabledSpot.style.backgroundColor = "#0000ff"; // 비어 있음
         }
 
         disabledParkingSpotsContainer.appendChild(disabledSpot);
     }
 };
+
+// 서버에서 주차 현황 데이터를 가져오는 함수
+const getStatus = async () => {
+    const url = `http://127.0.0.1:8002/status`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const availableSpots = {
+            total_available_spots: data.total_available_spots,
+            used_spots: data.used_spots,
+        };
+
+        const usedParknums = data.used_parknums;
+
+        // 데이터가 로드된 후에만 displayParkingSpots 호출
+        displayParkingSpots(availableSpots, usedParknums);
+    } catch (error) {
+        console.error('Error fetching parking status:', error);
+    }
+};
+
+// 페이지 로드 시 상태 업데이트
+window.onload = getStatus;
+
+
+
+
+
+
+

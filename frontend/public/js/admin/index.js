@@ -36,7 +36,7 @@ const displayCarList = (cars) => {
         <tr class="text-center">
             <td>${car.carnum}</td>
             <td>${car.intime}</td>
-            <td>${car.outtime || '주차중'}</td>
+            <td>${car.outtime ?? '주차중'}</td>
         </tr>
         `
     }

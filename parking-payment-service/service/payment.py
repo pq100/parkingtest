@@ -1,10 +1,16 @@
 from sqlalchemy.orm import Session
 from models.payment import Payment, Parking
 from schema.payment import PaymentBase
+from datetime import datetime
 
 # 새로운 결제 등록
 def register(db: Session, payment: PaymentBase):
-    new_payment = Payment(**payment.dict())  # dict() 메서드를 사용하여 데이터 변환
+    new_payment = Payment(
+        payment=payment.payment,
+        paydate=payment.paydate or datetime.now(),
+        parkingtime=payment.parkingtime,
+        carnum=payment.carnum
+    )
     db.add(new_payment)
     db.commit()
     db.refresh(new_payment)

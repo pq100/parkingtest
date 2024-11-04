@@ -31,10 +31,21 @@ router.get('/admin/parking', function(req, res, next) {
   res.sendFile(__dirname + '/views/admin/parking.html');
 });
 
+router.get('/admin/parkingspots', function(req, res, next) {
+  res.sendFile(__dirname + '/views/admin/parkingspots.html');
+});
+
+router.get('/admin/payment', function(req, res, next) {
+  res.sendFile(__dirname + '/views/admin/payment.html');
+});
+
 router.get('/admin/statistics', function(req, res, next) {
   res.sendFile(__dirname + '/views/admin/statistics.html');
 });
 
+router.get('/config', function(req, res, next) {
+  res.sendFile(__dirname + '/config.js');
+});
 
 
 module.exports = router;
